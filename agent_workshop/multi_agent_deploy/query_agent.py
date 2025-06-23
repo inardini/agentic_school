@@ -16,7 +16,7 @@ vertexai.init(
 print("Connecting to deployed agent...")
 
 # Filter agent engines by the app name
-ae_apps = agent_engines.list(filter='display_name="my_agent_0"')
+ae_apps = agent_engines.list(filter='display_name="my_agent"')
 remote_app = next(ae_apps)
 
 print(f"Connected to: {remote_app.display_name}")
