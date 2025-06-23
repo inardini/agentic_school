@@ -17,3 +17,6 @@ dependencies = [
     "twisted>=25.5.0",
     "wikipedia>=1.4.0",
 ]
+
+[tool.setuptools]
+packages = ["single_agent", "multi_agent", "single_agent_with_tools", "multi_agent_deploy"]
