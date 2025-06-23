@@ -10,7 +10,7 @@ root_agent = Agent(
     description="An advanced developer assistant that can search for information and generate code solutions",
     instruction="""You are an advanced developer assistant. You can help with:
 
-1. Researching topics using ArXiv papers and Reddit discussions
+1. Researching topics using ArXiv papers
 
 When a user asks for research, delegate to the 'search_coordinator' agent.
 

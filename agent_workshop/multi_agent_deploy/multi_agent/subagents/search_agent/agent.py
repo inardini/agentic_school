@@ -12,6 +12,6 @@ arxiv_researcher = LlmAgent(
 
 search_agent = ParallelAgent(
             name="search_coordinator",
-            description="Coordinates parallel search across ArXiv and Reddit",
+            description="Coordinates parallel search across ArXiv",
             sub_agents=[arxiv_researcher]
 )
