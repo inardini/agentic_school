@@ -1,0 +1,167 @@
+{
+    "eval_set_id": "developer_assistant_test_set",
+    "name": "Developer Assistant Basic Tests",
+    "description": "Unit tests for the developer assistant agent covering the 4 available tools: ArXiv search, web scraping, Reddit search, and JSON validation",
+    "eval_cases": [
+      {
+        "eval_id": "test_json_validation",
+        "conversation": [
+          {
+            "invocation_id": "test-001",
+            "user_content": {
+              "parts": [
+                {
+                  "text": "Can you validate this JSON for me: {\"name\": \"John\", \"age\": 30, \"skills\": [\"Python\", \"JavaScript\"]}"
+                }
+              ],
+              "role": "user"
+            },
+            "final_response": {
+              "parts": [
+                {
+                  "text": "The JSON is valid! Here's the parsed result with the developer data."
+                }
+              ],
+              "role": "model"
+            },
+            "intermediate_data": {
+              "tool_uses": [
+                {
+                  "name": "json_validator",
+                  "args": {
+                    "json_string": "{\"name\": \"John\", \"age\": 30, \"skills\": [\"Python\", \"JavaScript\"]}"
+                  }
+                }
+              ],
+              "intermediate_responses": []
+            }
+          }
+        ],
+        "session_input": {
+          "app_name": "developer_assistant",
+          "user_id": "test_user",
+          "state": {}
+        }
+      },
+      {
+        "eval_id": "test_arxiv_search",
+        "conversation": [
+          {
+            "invocation_id": "test-002",
+            "user_content": {
+              "parts": [
+                {
+                  "text": "Search for recent papers about transformer architectures in machine learning"
+                }
+              ],
+              "role": "user"
+            },
+            "final_response": {
+              "parts": [
+                {
+                  "text": "I found several papers about transformer architectures. Here are the top results from ArXiv:"
+                }
+              ],
+              "role": "model"
+            },
+            "intermediate_data": {
+              "tool_uses": [
+                {
+                  "name": "arxiv_search",
+                  "args": {
+                    "query": "transformer architectures machine learning"
+                  }
+                }
+              ],
+              "intermediate_responses": []
+            }
+          }
+        ],
+        "session_input": {
+          "app_name": "developer_assistant",
+          "user_id": "test_user",
+          "state": {}
+        }
+      },
+      {
+        "eval_id": "test_web_scraping",
+        "conversation": [
+          {
+            "invocation_id": "test-003",
+            "user_content": {
+              "parts": [
+                {
+                  "text": "Can you scrape the latest Python news from https://realpython.com?"
+                }
+              ],
+              "role": "user"
+            },
+            "final_response": {
+              "parts": [
+                {
+                  "text": "I've scraped the latest Python news and tutorials from Real Python for you."
+                }
+              ],
+              "role": "model"
+            },
+            "intermediate_data": {
+              "tool_uses": [
+                {
+                  "name": "WebScraper",
+                  "args": {
+                    "url": "https://realpython.com"
+                  }
+                }
+              ],
+              "intermediate_responses": []
+            }
+          }
+        ],
+        "session_input": {
+          "app_name": "developer_assistant",
+          "user_id": "test_user",
+          "state": {}
+        }
+      },
+      {
+        "eval_id": "test_reddit_search",
+        "conversation": [
+          {
+            "invocation_id": "test-004",
+            "user_content": {
+              "parts": [
+                {
+                  "text": "Search Reddit for discussions about Python best practices"
+                }
+              ],
+              "role": "user"
+            },
+            "final_response": {
+              "parts": [
+                {
+                  "text": "I found several Reddit discussions about Python best practices from developer communities."
+                }
+              ],
+              "role": "model"
+            },
+            "intermediate_data": {
+              "tool_uses": [
+                {
+                  "name": "mcp_reddit_tool",
+                  "args": {
+                    "query": "Python best practices"
+                  }
+                }
+              ],
+              "intermediate_responses": []
+            }
+          }
+        ],
+        "session_input": {
+          "app_name": "developer_assistant",
+          "user_id": "test_user",
+          "state": {}
+        }
+      }
+    ]
+  }

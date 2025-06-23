@@ -1,0 +1,237 @@
+{
+    "eval_set_id": "developer_assistant_integration_tests",
+    "name": "Developer Assistant Integration Tests",
+    "description": "Integration tests for complex multi-turn conversations using ArXiv search, web scraping, Reddit search, and JSON validation",
+    "eval_cases": [
+      {
+        "eval_id": "research_workflow",
+        "conversation": [
+          {
+            "invocation_id": "int-001-1",
+            "user_content": {
+              "parts": [
+                {
+                  "text": "I'm researching neural networks. First, find academic papers about neural network optimization."
+                }
+              ],
+              "role": "user"
+            },
+            "final_response": {
+              "parts": [
+                {
+                  "text": "I'll search for academic papers about neural network optimization on ArXiv."
+                }
+              ],
+              "role": "model"
+            },
+            "intermediate_data": {
+              "tool_uses": [
+                {
+                  "name": "arxiv_search",
+                  "args": {
+                    "query": "neural network optimization"
+                  }
+                }
+              ],
+              "intermediate_responses": []
+            }
+          },
+          {
+            "invocation_id": "int-001-2",
+            "user_content": {
+              "parts": [
+                {
+                  "text": "Now check what developers are saying about neural networks on Reddit."
+                }
+              ],
+              "role": "user"
+            },
+            "final_response": {
+              "parts": [
+                {
+                  "text": "I'll search Reddit for developer discussions about neural networks."
+                }
+              ],
+              "role": "model"
+            },
+            "intermediate_data": {
+              "tool_uses": [
+                {
+                  "name": "mcp_reddit_tool",
+                  "args": {
+                    "query": "neural networks"
+                  }
+                }
+              ],
+              "intermediate_responses": []
+            }
+          },
+          {
+            "invocation_id": "int-001-3",
+            "user_content": {
+              "parts": [
+                {
+                  "text": "Finally, validate this neural network config JSON: {\"architecture\": \"CNN\", \"layers\": [32, 64, 128], \"activation\": \"relu\", \"dropout\": 0.2}"
+                }
+              ],
+              "role": "user"
+            },
+            "final_response": {
+              "parts": [
+                {
+                  "text": "The neural network configuration JSON is valid! The structure looks good for a CNN architecture."
+                }
+              ],
+              "role": "model"
+            },
+            "intermediate_data": {
+              "tool_uses": [
+                {
+                  "name": "json_validator",
+                  "args": {
+                    "json_string": "{\"architecture\": \"CNN\", \"layers\": [32, 64, 128], \"activation\": \"relu\", \"dropout\": 0.2}"
+                  }
+                }
+              ],
+              "intermediate_responses": []
+            }
+          }
+        ],
+        "session_input": {
+          "app_name": "developer_assistant",
+          "user_id": "test_user",
+          "state": {}
+        }
+      },
+      {
+        "eval_id": "full_stack_research",
+        "conversation": [
+          {
+            "invocation_id": "int-002-1",
+            "user_content": {
+              "parts": [
+                {
+                  "text": "I need to research Python web frameworks. Start by scraping documentation from https://fastapi.tiangolo.com"
+                }
+              ],
+              "role": "user"
+            },
+            "final_response": {
+              "parts": [
+                {
+                  "text": "I'll scrape the FastAPI documentation to get information about this Python web framework."
+                }
+              ],
+              "role": "model"
+            },
+            "intermediate_data": {
+              "tool_uses": [
+                {
+                  "name": "WebScraper",
+                  "args": {
+                    "url": "https://fastapi.tiangolo.com"
+                  }
+                }
+              ],
+              "intermediate_responses": []
+            }
+          },
+          {
+            "invocation_id": "int-002-2",
+            "user_content": {
+              "parts": [
+                {
+                  "text": "Now find academic papers about web framework performance"
+                }
+              ],
+              "role": "user"
+            },
+            "final_response": {
+              "parts": [
+                {
+                  "text": "I'll search for academic papers about web framework performance on ArXiv."
+                }
+              ],
+              "role": "model"
+            },
+            "intermediate_data": {
+              "tool_uses": [
+                {
+                  "name": "arxiv_search",
+                  "args": {
+                    "query": "web framework performance"
+                  }
+                }
+              ],
+              "intermediate_responses": []
+            }
+          },
+          {
+            "invocation_id": "int-002-3",
+            "user_content": {
+              "parts": [
+                {
+                  "text": "Check Reddit for FastAPI vs Django discussions"
+                }
+              ],
+              "role": "user"
+            },
+            "final_response": {
+              "parts": [
+                {
+                  "text": "I'll search Reddit for developer discussions comparing FastAPI and Django frameworks."
+                }
+              ],
+              "role": "model"
+            },
+            "intermediate_data": {
+              "tool_uses": [
+                {
+                  "name": "mcp_reddit_tool",
+                  "args": {
+                    "query": "FastAPI vs Django"
+                  }
+                }
+              ],
+              "intermediate_responses": []
+            }
+          },
+          {
+            "invocation_id": "int-002-4",
+            "user_content": {
+              "parts": [
+                {
+                  "text": "Validate this API configuration: {\"framework\": \"FastAPI\", \"version\": \"0.104.1\", \"features\": [\"async\", \"type-hints\", \"automatic-docs\"], \"database\": {\"type\": \"PostgreSQL\", \"async\": true}}"
+                }
+              ],
+              "role": "user"
+            },
+            "final_response": {
+              "parts": [
+                {
+                  "text": "The API configuration JSON is valid! It properly defines a FastAPI setup with PostgreSQL database."
+                }
+              ],
+              "role": "model"
+            },
+            "intermediate_data": {
+              "tool_uses": [
+                {
+                  "name": "json_validator",
+                  "args": {
+                    "json_string": "{\"framework\": \"FastAPI\", \"version\": \"0.104.1\", \"features\": [\"async\", \"type-hints\", \"automatic-docs\"], \"database\": {\"type\": \"PostgreSQL\", \"async\": true}}"
+                  }
+                }
+              ],
+              "intermediate_responses": []
+            }
+          }
+        ],
+        "session_input": {
+          "app_name": "developer_assistant",
+          "user_id": "test_user",
+          "state": {}
+        }
+      }
+    ]
+  }
