@@ -95,7 +95,7 @@ This method uses a `requirements.txt` file, which avoids the local project build
     pip install -r requirements.txt
     ```
 
-\</details\>
+</details>
 
 ## For Developers: Managing Dependencies
 
