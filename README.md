@@ -1,5 +1,7 @@
 # Building Your First Agent: A Hands-On Workshop
 
+This repository was created for the [Google Startup School: Agentic AI](https://cloudonair.withgoogle.com/events/startup-school-ai-q2-2025#) workshop (Q2 2025).
+
 This repository contains the code and resources for the "Building Your First Agent: Hands-On with the Agent Development Kit" talk (Level: 300, Advanced).
 
 This session is your practical guide to bringing your agent ideas to life\! Dive into building your very own intelligent agent. Get a deep dive into the Agent Development Kit (ADK) and see its core components in action. Join our step-by-step hands-on lab and create a simple yet powerful research assistant.
@@ -8,6 +10,16 @@ In this workshop, you will:
 
   * Learn how to evaluate your agents effectively, ensuring you choose the right agent for your specific use case.
   * Master the process of testing, debugging, and refining your agents to achieve optimal performance.
+
+## Repository Structure
+
+This repository contains four agent implementations, each in its own directory within the `agent_workshop` directory:
+
+*   **single_agent**: A basic conversational agent with no tools. It's a good starting point for understanding the basic structure of an ADK agent.
+*   **single_agent_with_tools**: An agent that can use tools to answer questions. This demonstrates how to add capabilities to an agent.
+*   **multi_agent**: A multi-agent system that delegates tasks to sub-agents. This shows how to build more complex agents that can handle a wider range of tasks.
+*   **multi_agent_deploy**: A deployable multi-agent system that can be queried. This is a more advanced example that shows how to deploy an agent to a production environment.
+*   **a2a_quickstart.ipynb**: A Jupyter Notebook that provides a quickstart guide to the Agent-to-Agent (A2A) communication protocol.
 
 ## Prerequisites
 
@@ -50,12 +62,12 @@ This method is **highly recommended** as it is significantly faster and more rel
     uv pip sync uv.lock
     ```
 
-You are now ready to go\!
+You are now ready to go!
 
-\<br\>
+<br>
 
-\<details\>
-\<summary\>\<b\>Alternative Setup (using pip)\</b\>\</summary\>
+<details>
+<summary><b>Alternative Setup (using pip)</b></summary>
 
 These methods use `pip` and do not require `uv`. They are noticeably slower than the recommended `uv` setup but will still work.
 
@@ -83,7 +95,7 @@ This method uses a `requirements.txt` file, which avoids the local project build
     pip install -r requirements.txt
     ```
 
-\</details\>
+</details>
 
 ## For Developers: Managing Dependencies
 
