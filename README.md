@@ -21,6 +21,11 @@ This repository contains four agent implementations, each in its own directory w
 *   **multi_agent_deploy**: A deployable multi-agent system that can be queried. This is a more advanced example that shows how to deploy an agent to a production environment.
 *   **a2a_quickstart.ipynb**: A Jupyter Notebook that provides a quickstart guide to the Agent-to-Agent (A2A) communication protocol.
 
+## Workshop Recordings
+
+*   [Building Your First Agent: Hands-On with the Agent Development Kit](https://www.youtube.com/watch?v=mAYyQ5Im4vc) by [Ivan Nardini](https://www.linkedin.com/in/ivan-nardini/)
+*   [From Zero to Hero: A Developer's Guide to Building Production-Ready AI Agents](https://www.youtube.com/watch?v=ux3MVI8Td60) by [Pier Paolo Ippolito](https://www.linkedin.com/in/pierpaolo28/)
+
 ## Prerequisites
 
 Before you begin, ensure you have the following installed on your system:
