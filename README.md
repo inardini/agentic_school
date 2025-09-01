@@ -1,5 +1,7 @@
 # Building Your First Agent: A Hands-On Workshop
 
+![Workshop Intro](header.png)
+
 This repository was created for the [Google Startup School: Agentic AI](https://cloudonair.withgoogle.com/events/startup-school-ai-q2-2025#) workshop (Q2 2025).
 
 This repository contains the code and resources for the "Building Your First Agent: Hands-On with the Agent Development Kit" talk (Level: 300, Advanced).
