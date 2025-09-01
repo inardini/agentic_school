@@ -1,53 +1,161 @@
 import os
-from dotenv import load_dotenv
+import uuid
 import vertexai
 from vertexai import agent_engines
-
-# Load environment variables and initialize Vertex AI
-load_dotenv()
-
-# Initialize Vertex AI with the correct project and location
-vertexai.init(
-    project=os.getenv("GOOGLE_CLOUD_PROJECT"),
-    location=os.getenv("GOOGLE_CLOUD_LOCATION"),
-    staging_bucket=os.getenv("GOOGLE_CLOUD_BUCKET"),
+from typing import Any, Iterator, Optional
+from google.adk.agents import LlmAgent
+from google.adk.runners import Runner
+from google.adk.sessions import InMemorySessionService
+from google.adk.tools.mcp_tool import StdioConnectionParams
+from google.adk.tools.mcp_tool.mcp_toolset import (
+    MCPToolset,
+    StdioServerParameters,
 )
+from google.genai import types
+from vertexai.preview.reasoning_engines import AdkApp
 
-print("Connecting to deployed agent...")
+def run_queries(
+    app, queries: list[str], user_id: Optional[str] = None, session_id: Optional[str] = None
+) -> None:
+    """Run a list of queries against an AI application."""
 
-# Filter agent engines by the app name
-ae_apps = agent_engines.list(filter='display_name="my_agent"')
-remote_app = next(ae_apps)
+    # Simple setup
+    user_id = user_id or f"u_{uuid.uuid4().hex[:8]}"
 
-print(f"Connected to: {remote_app.display_name}")
+    # Handle session based on app type
+    if isinstance(app, (AdkApp, agent_engines.AgentEngine)):
+        # Only create session if session_id is not provided
+        if not session_id:
+            session = app.create_session(user_id=user_id)
+            # Handle both dict and object session responses
+            if isinstance(session, dict):
+                session_id = session["id"]
+            else:
+                session_id = session.id
 
-# Get a session for the remote app
-remote_session = remote_app.create_session(user_id="u_0")
-print(f"Session created: {remote_session['id']}")
+        def query_fn(msg: str):
+            return app.stream_query(user_id=user_id, session_id=session_id, message=msg)
 
-# Example messages to test different capabilities
-test_messages = [
-    "Hello, are you there?",
-    "Search for recent papers about machine learning agents on ArXiv"
-]
+    elif isinstance(app, Runner):
+        session_id = session_id or f"s_{uuid.uuid4().hex[:8]}"
 
-for i, user_message in enumerate(test_messages, 1):
-    print(f"\n--- Test {i} ---")
-    print(f"[user message] {user_message}")
-    
-    # Run the agent with this input
-    events = remote_app.stream_query(
-        user_id="u_0",
-        session_id=remote_session["id"],
-        message=user_message,
-    )
-    
-    print("[remote response]")
-    # Print responses
-    for event in events:
-        for part in event["content"]["parts"]:
-            if "text" in part:
-                response_text = part["text"]
-                print(response_text)
-    
+        def query_fn(msg: str):
+            return app.run(
+                user_id=user_id,
+                session_id=session_id,
+                new_message=types.Content(role="user", parts=[types.Part(text=msg)]),
+            )
+
+    else:
+        raise TypeError(
+            f"Unsupported app type: {type(app)}. Expected AdkApp, AgentEngine, or Runner."
+        )
+
+    _print_startup_info(user_id, session_id)
+
+    # Main loop
+    for query in queries:
+        try:
+            print(f"\nYou: {query}")
+            print("\nAssistant: ", end="", flush=True)
+
+            response = _get_response_text(query_fn(query))
+            print(response or "(No response generated)")
+
+        except Exception as e:
+            print(f"\nError: {e}")
+            continue
+
+    print("\nGoodbye!")
+
+
+def _print_startup_info(user_id: str, session_id: str) -> None:
+    """Print startup information."""
+    print("\nStarting chat...")
+    print(f"User ID: {user_id}")
+    print(f"Session ID: {session_id}")
     print("-" * 50)
+
+
+def _get_response_text(events: Iterator[Any]) -> str:
+    """Extract response text from event stream."""
+    responses = []
+
+    for event in events:
+        # Handle dict-like events (AgentEngine format)
+        if isinstance(event, dict):
+            text = _extract_from_dict_event(event)
+        # Handle object-like events
+        else:
+            text = _extract_from_object_event(event)
+
+        if text:
+            responses.append(text)
+            # Print streaming text in real-time
+            print(text, end="", flush=True)
+
+    return "".join(responses)
+
+
+def _extract_from_dict_event(event: dict) -> Optional[str]:
+    """Extract text from dictionary-style events (AgentEngine format)."""
+    # Handle AgentEngine response format
+    if "parts" in event and "role" in event:
+        # Only extract text from model responses, skip function calls/responses
+        if event.get("role") == "model":
+            parts = event.get("parts", [])
+            text_parts = []
+
+            for part in parts:
+                # Extract text content, skip function calls
+                if isinstance(part, dict) and "text" in part:
+                    text_parts.append(part["text"])
+
+            return "".join(text_parts) if text_parts else None
+        return None
+
+    # Handle other dict formats
+    content = event.get("content", {})
+    if isinstance(content, str):
+        return content
+
+    parts = content.get("parts", [])
+    if not parts:
+        return None
+
+    text_parts = []
+    for part in parts:
+        if isinstance(part, dict) and "text" in part:
+            text_parts.append(part["text"])
+
+    return "".join(text_parts) if text_parts else None
+
+
+def _extract_from_object_event(event: Any) -> Optional[str]:
+    """Extract text from object-style events."""
+    # Handle string content directly
+    content = getattr(event, "content", None)
+    if isinstance(content, str):
+        return content
+
+    # Handle content with parts
+    if content and hasattr(content, "parts"):
+        text_parts = []
+        for part in content.parts:
+            if hasattr(part, "text") and part.text:
+                text_parts.append(part.text)
+        return "".join(text_parts) if text_parts else None
+
+    # Handle direct text attribute
+    return getattr(event, "text", None)
+
+if __name__ == "__main__":
+    vertexai.init(
+        project=os.getenv("GOOGLE_CLOUD_PROJECT"),
+        location=os.getenv("GOOGLE_CLOUD_LOCATION"),
+    )
+    agent_engine = agent_engines.get("projects/974417049733/locations/us-central1/reasoningEngines/2196705485040648192")
+    queries = [
+        "Write a python script to parse a CSV file and print the first 5 rows."
+    ]
+    run_queries(agent_engine, queries)
