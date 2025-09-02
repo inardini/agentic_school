@@ -6,56 +6,58 @@ This lesson introduces the concept of **multi-agent systems**. Instead of a sing
 
 This example features a "developer assistant" that acts as a coordinator, delegating tasks to two specialized sub-agents: a `search_agent` and a `code_agent`.
 
-## Technical Background
+## How to Deploy and Run this Agent
 
-*   **`sub_agents`**: The `LlmAgent` constructor has a `sub_agents` parameter, which is a list of other agent instances that the parent agent can delegate tasks to.
-*   **Delegation**: The parent agent uses its LLM to decide which sub-agent is best suited to handle a particular request. It then delegates the task to that sub-agent. This is a powerful way to build complex systems from simpler components.
-*   **`SequentialAgent`**: This is a type of workflow agent that executes a series of sub-agents in a specific order. It's useful for creating pipelines where the output of one agent becomes the input of the next.
-*   **`LoopAgent`**: This is another workflow agent that repeatedly executes its sub-agents until a certain condition is met. This is useful for iterative processes like code generation and refinement.
+### 1. Prerequisites
 
-The root agent in this example is a coordinator:
+- You have a Google Cloud project with the Vertex AI API enabled.
+- You have a Google Cloud Storage bucket.
+- You have Python 3.12 or later installed.
+- You have authenticated your local environment with Google Cloud using `gcloud auth application-default login`.
 
-```python
-from google.adk.agents import Agent
-from .subagents.search_agent.agent import search_agent
-from .subagents.code_agent.agent import code_agent
-from dotenv import load_dotenv
+### 2. Setup your Environment
 
-load_dotenv()
+- **Create a virtual environment:**
+  ```bash
+  python3 -m venv .venv
+  ```
+- **Activate the virtual environment:**
+  ```bash
+  source .venv/bin/activate
+  ```
+- **Install the required packages:**
+  ```bash
+  pip install "google-cloud-aiplatform[adk,agent_engines]" langchain-community arxiv python-dotenv
+  ```
+- **Set environment variables:**
+  Create a `.env` file in this directory with the following content:
+  ```
+  GOOGLE_CLOUD_PROJECT="your-project-id"
+  GOOGLE_CLOUD_LOCATION="your-location"
+  GOOGLE_CLOUD_BUCKET="your-bucket-name"
+  ```
+  Replace the placeholder values with your actual project ID, location, and bucket name.
 
-root_agent = Agent(
-    name="developer_assistant",
-    model="gemini-2.0-flash", 
-    description="An advanced developer assistant that can search for information and generate code solutions",
-    instruction="""You are an advanced developer assistant. You can help with:
+### 3. Deploy the Agent
 
-1. Researching topics using ArXiv papers and Reddit discussions
+- **Run the deployment script:**
+  ```bash
+  python deploy.py
+  ```
+- **Copy the resource name:**
+  The script will output the resource name of the deployed agent. It will look something like this:
+  `projects/your-project-number/locations/your-location/reasoningEngines/your-reasoning-engine-id`
+  Copy this resource name for the next step.
 
-When a user asks for research, delegate to the 'search_coordinator' agent.
+### 4. Test the Agent
 
-When a user asks for code solutions, delegate to the 'code_coordinator' agent.
-
-When a user asks for both research and code, coordinate between both agents as needed.
-
-Always provide comprehensive and helpful responses based on the specialized agents' outputs.""",
-    sub_agents=[
-        search_agent,
-        code_agent
-    ]
-)
-```
-
-## How to Run this Agent
-
-1.  **Activate your virtual environment:**
-    ```bash
-    source .venv/bin/activate
-    ```
-
-2.  **Run the agent using the ADK CLI:**
-    ```bash
-    adk run /home/user/agentic_school/agent_workshop/multi_agent
-    ```
-
-3.  **Interact with the agent:**
-    Try asking a question that requires delegation. For example: "Create a python script to print 'hello world'."
+- **Update the query script:**
+  Open the `query_agent.py` file and replace the placeholder resource name in the following line with the resource name you copied in the previous step:
+  ```python
+  agent_engine = agent_engines.get("projects/974417049733/locations/us-central1/reasoningEngines/4739550424644714496")
+  ```
+- **Run the query script:**
+  ```bash
+  python query_agent.py
+  ```
+  The script will run the queries defined in the `queries` list and print the agent's responses.
