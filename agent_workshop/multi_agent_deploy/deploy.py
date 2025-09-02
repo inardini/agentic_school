@@ -17,10 +17,10 @@ print("Deploying multi-agent system to Vertex AI Agent Engine...")
 
 # Create and deploy the agent engine
 remote_app = agent_engines.create(
-    display_name="multi_agent_reddit",
-    description="A multi-agent system with Reddit search capabilities.",
+    display_name="hello_agent",
+    description="A simple hello world agent.",
     agent_engine=agent_engines.ModuleAgent(
-        module_name="multi_agent_deploy.root_agent",
+        module_name="root_agent",
         agent_name="agent_app",
         register_operations={
             "": ["get_session", "list_sessions", "create_session", "delete_session"],
@@ -41,17 +41,11 @@ remote_app = agent_engines.create(
         "python-dotenv"
     ],
     extra_packages=[
-        "multi_agent_deploy/root_agent.py",
-        "multi_agent_deploy/installation_scripts/install_mcp.sh",
+        "root_agent.py",
     ],
     env_vars={
         "PROJECT_ID": os.getenv("GOOGLE_CLOUD_PROJECT"),
         "LOCATION": os.getenv("GOOGLE_CLOUD_LOCATION"),
-    },
-    build_options={
-        "installation": [
-            "multi_agent_deploy/installation_scripts/install_mcp.sh",
-        ],
     },
 )
 

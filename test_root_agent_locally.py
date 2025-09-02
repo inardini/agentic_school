@@ -1,18 +1,14 @@
-import os
+import asyncio
+import aiofiles
 import uuid
-import vertexai
-from vertexai import agent_engines
 from typing import Any, Iterator, Optional
-from google.adk.agents import LlmAgent
+
+from root_agent import create_root_agent
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
-from google.adk.tools.mcp_tool import StdioConnectionParams
-from google.adk.tools.mcp_tool.mcp_toolset import (
-    MCPToolset,
-    StdioServerParameters,
-)
 from google.genai import types
 from vertexai.preview.reasoning_engines import AdkApp
+from vertexai import agent_engines
 
 def run_queries(
     app, queries: list[str], user_id: Optional[str] = None, session_id: Optional[str] = None
@@ -149,13 +145,27 @@ def _extract_from_object_event(event: Any) -> Optional[str]:
     # Handle direct text attribute
     return getattr(event, "text", None)
 
-if __name__ == "__main__":
-    vertexai.init(
-        project=os.getenv("GOOGLE_CLOUD_PROJECT"),
-        location=os.getenv("GOOGLE_CLOUD_LOCATION"),
+async def main():
+    session_service = InMemorySessionService()
+    user_id = "test_user"
+    session = await session_service.create_session(app_name="test_app", user_id=user_id)
+    
+    errlog = await aiofiles.open("error.log", "w+")
+    
+    root_agent = create_root_agent(errlog)
+
+    runner = Runner(
+        agent=root_agent, app_name="test_app", session_service=session_service
     )
-    agent_engine = agent_engines.get("projects/974417049733/locations/us-central1/reasoningEngines/469012077990641664")
+    
     queries = [
-        "hello"
+        "Search reddit for 'large language models'"
     ]
-    run_queries(agent_engine, queries)
+
+    try:
+        run_queries(app=runner, queries=queries, user_id=user_id, session_id=session.id)
+    finally:
+        await errlog.close()
+
+if __name__ == "__main__":
+    asyncio.run(main())

@@ -2,6 +2,9 @@
 # Exit immediately if a command exits with a non-zero status.
 set -e
 
+echo "========================================="
+echo "Executing install_mcp.sh"
+
 echo "Installing MCP Reddit Server"
 
 # Install uv (a fast Python package manager)
@@ -17,3 +20,5 @@ export PATH="$HOME/.local/bin:$PATH"
 echo "Installing mcp-reddit using uv..."
 uv pip install "git+https://github.com/adhikasp/mcp-reddit.git" --system
 echo "MCP Reddit Server installation complete."
+
+echo "========================================="
