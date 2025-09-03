@@ -1,4 +1,4 @@
-# Lesson 3: Building a Multi-Agent System
+# Lesson 4: Deploying a Multi-Agent System
 
 ## Purpose of this Lesson
 
