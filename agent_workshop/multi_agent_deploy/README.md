@@ -2,72 +2,62 @@
 
 ## Purpose of this Lesson
 
-This lesson demonstrates how to take a multi-agent system, like the one in the previous lesson, and prepare it for deployment as a standalone application. This involves creating a queryable endpoint that can be used to interact with the agent.
+This lesson introduces the concept of **multi-agent systems**. Instead of a single, monolithic agent, you can create a team of specialized agents that collaborate to solve complex problems. This approach promotes modularity, reusability, and can lead to more robust and capable AI systems.
 
-This example is very similar to the `multi_agent` example, but it includes a `query_agent.py` script that shows how to programmatically interact with the agent.
+This example features a "developer assistant" that acts as a coordinator, delegating tasks to two specialized sub-agents: a `search_agent` and a `code_agent`.
 
-## Technical Background
+## How to Deploy and Run this Agent
 
-*   **`Runner`**: The `Runner` class is the main entry point for interacting with an agent programmatically. It manages the agent's lifecycle, the event loop, and coordinates with the various services (like the session service).
-*   **`SessionService`**: This service is responsible for creating, retrieving, and managing conversation sessions. The `InMemorySessionService` is a simple implementation that stores session data in memory.
-*   **`run_async`**: This is the main method of the `Runner` class. It takes a user's message and returns an asynchronous generator that yields events as the agent processes the request.
+### 1. Prerequisites
 
-The `query_agent.py` script shows how to use these components to interact with the agent:
+- You have a Google Cloud project with the Vertex AI API enabled.
+- You have a Google Cloud Storage bucket.
+- You have Python 3.12 or later installed.
+- You have authenticated your local environment with Google Cloud using `gcloud auth application-default login`.
 
-```python
-import asyncio
+### 2. Setup your Environment
 
-from google.adk.runners import Runner
-from google.adk.sessions import InMemorySessionService
-from multi_agent.agent import root_agent
-from google.genai import types as genai_types
+- **Create a virtual environment:**
+  ```bash
+  python3 -m venv .venv
+  ```
+- **Activate the virtual environment:**
+  ```bash
+  source .venv/bin/activate
+  ```
+- **Install the required packages:**
+  ```bash
+  pip install "google-cloud-aiplatform[adk,agent_engines]" langchain-community arxiv python-dotenv
+  ```
+- **Set environment variables:**
+  Create a `.env` file in this directory with the following content:
+  ```
+  GOOGLE_CLOUD_PROJECT="your-project-id"
+  GOOGLE_CLOUD_LOCATION="your-location"
+  GOOGLE_CLOUD_BUCKET="your-bucket-name"
+  ```
+  Replace the placeholder values with your actual project ID, location, and bucket name.
 
+### 3. Deploy the Agent
 
-async def main():
-    """Runs the agent with a sample query."""
-    session_service = InMemorySessionService()
-    session = await session_service.create_session(
-        app_name="app", user_id="test_user", session_id="test_session"
-    )
-    runner = Runner(
-        agent=root_agent, app_name="app", session_service=session_service
-    )
-    query = "Create a python script to print 'hello world'."
-    async for event in runner.run_async(
-        user_id="test_user",
-        session_id=session.id,
-        new_message=genai_types.Content(
-            role="user", 
-            parts=[genai_types.Part.from_text(text=query)]
-        ),
-    ):
-        if event.is_final_response():
-            pass
+- **Run the deployment script:**
+  ```bash
+  python deploy.py
+  ```
+- **Copy the resource name:**
+  The script will output the resource name of the deployed agent. It will look something like this:
+  `projects/your-project-number/locations/your-location/reasoningEngines/your-reasoning-engine-id`
+  Copy this resource name for the next step.
 
-    # Get the session again to get the updated state
-    updated_session = await session_service.get_session(app_name="app", user_id="test_user", session_id=session.id)
-    # Print the final generated code from the session state
-    final_code = updated_session.state.get("current_code")
-    if final_code:
-        cleaned_code = final_code.replace("```python", "").replace("```", "").strip()
-        print(f"```python\n{cleaned_code}\n```")
+### 4. Test the Agent
 
-
-if __name__ == "__main__":
-    asyncio.run(main())
-```
-
-## How to Run this Agent
-
-1.  **Activate your virtual environment:**
-    ```bash
-    source .venv/bin/activate
-    ```
-
-2.  **Run the `query_agent.py` script:**
-    ```bash
-    python /home/user/agentic_school/agent_workshop/multi_agent_deploy/query_agent.py
-    ```
-
-This will run the agent with the hardcoded query and print the final generated code to the console.
-
+- **Update the query script:**
+  Open the `query_agent.py` file and replace the placeholder resource name in the following line with the resource name you copied in the previous step:
+  ```python
+  agent_engine = agent_engines.get("projects/your-project-number/locations/your-location/reasoningEngines/your-reasoning-engine-id")
+  ```
+- **Run the query script:**
+  ```bash
+  python query_agent.py
+  ```
+  The script will run the queries defined in the `queries` list and print the agent's responses.
