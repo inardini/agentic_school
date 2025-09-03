@@ -54,7 +54,7 @@ This example features a "developer assistant" that acts as a coordinator, delega
 - **Update the query script:**
   Open the `query_agent.py` file and replace the placeholder resource name in the following line with the resource name you copied in the previous step:
   ```python
-  agent_engine = agent_engines.get("projects/974417049733/locations/us-central1/reasoningEngines/4739550424644714496")
+  agent_engine = agent_engines.get("projects/your-project-number/locations/your-location/reasoningEngines/your-reasoning-engine-id")
   ```
 - **Run the query script:**
   ```bash

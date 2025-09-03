@@ -154,7 +154,7 @@ if __name__ == "__main__":
         project=os.getenv("GOOGLE_CLOUD_PROJECT"),
         location=os.getenv("GOOGLE_CLOUD_LOCATION"),
     )
-    agent_engine = agent_engines.get("projects/974417049733/locations/us-central1/reasoningEngines/4739550424644714496")
+    agent_engine = agent_engines.get("projects/your-project-number/locations/your-location/reasoningEngines/your-reasoning-engine-id")
     queries = [
         "What are the latest advancements in Large Language Models?",
         "What are the best subreddits for learning about prompt engineering?",
